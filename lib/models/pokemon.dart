@@ -82,7 +82,7 @@ class Pokemon {
     }
     for (var type in value) {
       if (!_validatePokemonType(type)) {
-        throw Exception('Invalid Pokemon type: `$type`'); 
+        throw Exception('Invalid Pokemon type: $type'); 
       }
     }
     _types = value;
@@ -99,5 +99,37 @@ class Pokemon {
   // Helper method to check the static list
   bool _validatePokemonType(String type) {
     return _validPokemonTypes.contains(type.toLowerCase());
+  }
+  // Factory constructor to handle the raw PokeAPI JSON
+  factory Pokemon.fromPokeApiData(dynamic data) {
+    // Dig into the JSON to pull out just the type names
+    List<String> parsedTypes = [];
+    if (data['types'] != null) {
+      for (var typeObj in data['types']) {
+        parsedTypes.add(typeObj['type']['name'] as String);
+      }
+    }
+
+    // Convert API units (decimeters/hectograms) to standard metric (meters/kg)
+    // Using 'num' here because JSON numbers can randomly parse as int or double
+    double heightInMeters = (data['height'] as num) / 10.0;
+    double weightInKg = (data['weight'] as num) / 10.0;
+
+    return Pokemon(
+      name: data['name'],
+      id: data['id'],
+      height: heightInMeters,
+      weight: weightInKg,
+      baseExperience: data['base_experience'],
+      types: parsedTypes,
+      captureDate: DateTime.now(),
+    );
+  }
+
+  // Override toString
+  @override
+  String toString() {
+    // Dart automatically formats lists with brackets and commas
+    return 'Pokemon: $name (#$id), Type(s): $types, Height: ${height}m, Weight: ${weight}kg, Base Experience: $baseExperience, Captured: $captureDate';
   }
 }
