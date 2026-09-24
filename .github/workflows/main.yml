@@ -1,0 +1,15 @@
+name: Automated Testing Demo
+
+on: workflow_dispatch
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dart-lang/setup-dart@v1
+
+      - run: dart pub get
+      - run: dart format --output=none .
+      - run: dart analyze .
+      - run: dart test
